@@ -35,7 +35,8 @@ class Database:
         return (X_train, y_train)
 
     def delete_label(self, label):
-        self.dfObj = self.dfObj.loc[self.dfObj["label"] != label]
+        self.dfObj = self.dfObj.loc[self.dfObj["Label"] != label]
+        print(self.dfObj)
 
     def to_csv(self):
         self.dfObj.to_csv('data.csv')
@@ -43,31 +44,3 @@ class Database:
     def read_csv(self, file):
         data = pd.read_csv(file)
         return data
-        
-
-# # Get the images
-# IMAGE_FILES = []
-
-# def get_files_names(letter, start, end):
-#     img_files = []
-#     for i in range(start, end):
-#         os.path.join("asl", "asl_alphabet", "a", "a1.jpg")
-
-# with mp_hands.Hands(
-#     static_image_mode=True,
-#     max_num_hands=1,
-#     min_detection_confidence=0.5) as hands:
-#     for idx, file in enumerate(IMAGE_FILES):
-#         # Read an image, flip it around y-axis for correct handedness output (see above).
-#         image = cv2.flip(cv2.imread(file), 1)
-#         # Convert the BGR image to RGB before processing.
-#         results = hands.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
-
-#         if not results.multi_hand_landmarks:
-#             continue
-        
-#         for hand_landmarks in results.multi_hand_landmarks:
-#             print('hand_landmarks:', hand_landmarks)
-
-
-# # Make pandas dataframe from the images

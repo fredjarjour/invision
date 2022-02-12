@@ -38,7 +38,7 @@ param_grid = {"learning_rate":learning_rate,
               "min_samples_leaf":min_samples_leaf,
               "max_features":max_features}
 
-# Creating model and running rcv to find the best parameters
+# Creating model and running rsv to find the best parameters
 gb_rs = RandomizedSearchCV(estimator = gb, param_distributions = param_grid, random_state=1)
 gb_rs.fit(X_train,y_train)
 
@@ -53,12 +53,15 @@ GradientBoostingRegressor(learning_rate=0.01, max_depth=4, max_features='auto',
 
 # Making predictions
 predictions = model.predict(X_test)
-predictions
+print(predictions)
 
 # Evaluates predictions 
 print('r2:', r2_score(y_test, predictions))
 print('MAE:', mean_absolute_error(y_test, predictions))
 print('MSE:', mean_squared_error(y_test, predictions))
+
+# Imports 
+model = pd.read_pickle(r'predictor/price/vehicles/file.pkl')
 
 # Dumps model into a pkl file
 file = open("file.pkl", "wb") 

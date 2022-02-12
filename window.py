@@ -6,7 +6,7 @@ from PIL import Image, ImageTk
 
 class App(threading.Thread):
 
-    def __init__(self, on_window_update, on_map_pressed):
+    def __init__(self, on_window_update, on_map_pressed, on_del_pressed, on_save_pressed):
         threading.Thread.__init__(self)
         self.start()
 
@@ -14,6 +14,8 @@ class App(threading.Thread):
         self.selected_action = None
         self.on_window_update = on_window_update
         self.on_map_pressed = on_map_pressed
+        self.on_del_pressed = on_del_pressed
+        self.on_save_pressed = on_save_pressed
 
     def callback(self):
         self.root.quit()
@@ -49,9 +51,17 @@ class App(threading.Thread):
 
     def del_btn_pressed(self):
         if self.selected_action != None:
-            self.actions_list.delete(self.selected_action)
+            label = self.actions_list.get(self.selected_action)
+            print(label)
+            for i in range(self.actions_list.size()-1, -1, -1):
+                if self.actions_list.get(i) == label:
+                    self.actions_list.delete(i)
             self.selected_action = None
             self.del_btn.config(state="disabled")
+            self.on_del_pressed(self, label)
+    
+    def save_btn_pressed(self):
+        self.on_save_pressed(self)
 
     def on_actions_list_select(self, event):
         selection = event.widget.curselection()
@@ -123,6 +133,18 @@ class App(threading.Thread):
             # Delete action
             self.del_btn = ttk.Button(self.training, text="Delete action",state="disabled", command=self.del_btn_pressed)
             self.del_btn.pack()
+
+            # Save model action
+            self.save_btn = ttk.Button(self.training, text="Save model", command=self.save_btn_pressed)
+            self.save_btn.pack()
+
+            # Train model action
+            self.train_btn = ttk.Button(self.training, text="Train model",state="disabled", command=None)
+            self.train_btn.pack()
+
+            # Play action
+            self.play_btn = ttk.Button(self.training, text="Play",state="disabled", command=None)
+            self.play_btn.pack()
 
             self.settings = tk.Frame(self.root)
             self.settings.pack(side=tk.BOTTOM, fill=tk.X, padx=1.5, pady=1.5)

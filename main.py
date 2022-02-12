@@ -54,8 +54,6 @@ def on_results(handsObj, results, frame, is_right_hand_visible, is_left_hand_vis
         
         current_mapping.extend(new_landmarkers)
 
-        
-
         frame_counter += 1
 
     elif mapping:
@@ -71,14 +69,15 @@ def on_results(handsObj, results, frame, is_right_hand_visible, is_left_hand_vis
         # Add the scaled data to the database
         database.append_to_dataframe(current_mapping)
         
-        # print(database.dfObj)
+        print(database.dfObj)
         app.enable_controls()
         app.progress_bar["value"] = 0
         mapping = False
         frame_counter = 0
         # merge it with label
         
-        
+    # When Play mode is activated: 
+    # Import model, run it on data and take the ouput to presss button
 
     
     # database.append_to_dataframe(data)
@@ -116,7 +115,15 @@ def on_map_pressed(application, label):
     application.disable_controls()
     mapping = True
     current_mapping = [label]
-    
+
+def on_del_pressed(application, label):
+    global database
+    database.delete_label(label)
+
+def on_save_pressed(application):
+    global database
+    database.to_csv()
+
 
 def on_window_update(hands_preview_enabled):
     global preview_enabled
@@ -126,6 +133,6 @@ def on_window_update(hands_preview_enabled):
 if (__name__ == '__main__'):
     print("Running.")
     database = Database()
-    app = App(on_window_update, on_map_pressed)
+    app = App(on_window_update, on_map_pressed, on_del_pressed, on_save_pressed)
     gamepad = Gamepad()
     hands = Hands(on_results, 1)
