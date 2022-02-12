@@ -15,16 +15,17 @@ gamepad : Gamepad = None
 hands : Hands = None
 app : App = None
 
-def on_results(results):
-    
+def on_results(results, frame):
+    app.update_frame(frame)
+
     # Check if hands are visible in the frame
     if results.multi_hand_landmarks:
-        # for hand_landmarks in results.multi_hand_landmarks:
-        #     print(hand_landmarks)
+        
         gamepad.reset()
-        print(results.multi_handedness)
+        
         for hand in results.multi_handedness:
-            print(hand.classification[0].index)
+            # print(hand.classification)
+            # print(hand.classification[0].index)
             
             for c in hand.classification:
                 if c.index == 0 and not gamepad.button_pressed["XUSB_GAMEPAD_A"]:
@@ -32,7 +33,7 @@ def on_results(results):
                 elif c.index == 1 and not gamepad.button_pressed["XUSB_GAMEPAD_B"]:
                     gamepad.press_button(XUSB_BUTTON.XUSB_GAMEPAD_B)
             
-            print(gamepad.compare_button(gamepad.gamepad.report.wButtons))
+            # print(gamepad.compare_button(gamepad.gamepad.report.wButtons))
 
             # gamepad.reset()
             # if hand.classification[0].index == 0:

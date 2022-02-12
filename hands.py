@@ -11,7 +11,6 @@ class Hands:
         self.mp_hands = mp.solutions.hands
 
         # Start camera
-        self.prev_frame = None
         self.prev_results = None
         self.cap = cv2.VideoCapture(camera_id) # Cap is the camera
 
@@ -32,15 +31,13 @@ class Hands:
                 # pass by reference.
                 image.flags.writeable = False
                 image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-                self.prev_frame = image
                 results = hands.process(image) # results
                 self.prev_results = results
 
-                callback(results)
 
                 # Draw the hand annotations on the image.
                 image.flags.writeable = True
-                image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+                # image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
                 if results.multi_hand_landmarks:
                     for hand_landmarks in results.multi_hand_landmarks:
@@ -51,7 +48,8 @@ class Hands:
                             self.mp_drawing_styles.get_default_hand_landmarks_style(),
                             self.mp_drawing_styles.get_default_hand_connections_style())
 
-                cv2.imshow('MediaPipe Hands', cv2.flip(image, 1))
+                #cv2.imshow('MediaPipe Hands', cv2.flip(image, 1))
+                callback(results, cv2.flip(image, 1))
                 if cv2.waitKey(5) & 0xFF == 27:
                     self.releaseCapture()
                     break

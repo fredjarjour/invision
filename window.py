@@ -1,5 +1,7 @@
 import tkinter as tk
 import threading
+from PIL import Image, ImageTk
+import numpy as np
 
 class App(threading.Thread):
 
@@ -18,10 +20,16 @@ class App(threading.Thread):
         # Resize window
         self.root.geometry("800x600")
 
-        label = tk.Label(self.root, text="Hello World")
-        label.pack()
-
-        # self.canvas = tk.Canvas(window, width = self.vid.width, height = self.vid.height)
+        self.label = tk.Label(self.root)
+        self.label.pack()
+        
+        # self.canvas = tk.Canvas(self.root)
         # self.canvas.pack()
 
         self.root.mainloop()
+
+    def update_frame(self, frame):
+        img = Image.fromarray(frame)
+        imgtk = ImageTk.PhotoImage(image=img)
+        self.label.configure(image=imgtk)
+        self.label.image = imgtk
