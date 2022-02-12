@@ -1,44 +1,63 @@
-import mediapipe as mp
+import pickle
 import pandas as pd
-import cv2
-import os
+import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sns
+from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV, StratifiedKFold, RandomizedSearchCV
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error, accuracy_score
+from main import database
 
+# Selecting model variables (change object to access the database)
 
-# Get the images
-IMAGE_FILES = []
+X, y = database.generate_training()
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1)
 
-def get_files_names(letter, start, end):
-    img_files = []
-    for i in range(start, end):
-        os.path.join("asl", "asl_alphabet", "a", "a1.jpg")
+gb = GradientBoostingRegressor()
 
+# Rate at which correcting is being made
+learning_rate = [0.001, 0.01, 0.1, 0.2]
+# Number of trees in Gradient boosting
+n_estimators=list(range(500,1000,100))
+# Maximum number of levels in a tree
+max_depth=list(range(4,9,4))
+# Minimum number of samples required to split an internal node
+min_samples_split=list(range(4,9,2))
+# Minimum number of samples required to be at a leaf node.
+min_samples_leaf=[1,2,5,7]
+# Number of features to be considered at each split
+max_features=['auto','sqrt']
 
-# Pass images through the MediaPipe pipeline to get the landmarks
+# Hyperparameters dict
+param_grid = {"learning_rate":learning_rate,
+              "n_estimators":n_estimators,
+              "max_depth":max_depth,
+              "min_samples_split":min_samples_split,
+              "min_samples_leaf":min_samples_leaf,
+              "max_features":max_features}
 
-mp_hands = mp.solutions.hands
+# Creating model and running rcv to find the best parameters
+gb_rs = RandomizedSearchCV(estimator = gb, param_distributions = param_grid, random_state=1)
+gb_rs.fit(X_train,y_train)
 
-data = {"letter": []}
+# Finding best parameters
+print("\n The best parameters across ALL searched params:\n", gb_rs.best_params_)
 
-for i in range(21):
-    data[f"x{str(i)}"] = []
-    data[f"y{str(i)}"] = []
-    data[f"z{str(i)}"] = []
+# Fiting model with best parameters
+model = GradientBoostingRegressor(n_estimators=600, min_samples_split= 4, min_samples_leaf= 1, max_features= 'auto', max_depth=4, learning_rate=0.01)
+model.fit(X_train, y_train)
+GradientBoostingRegressor(learning_rate=0.01, max_depth=4, max_features='auto',
+                          min_samples_split=4, n_estimators=600)
 
-with mp_hands.Hands(
-    static_image_mode=True,
-    max_num_hands=1,
-    min_detection_confidence=0.5) as hands:
-    for idx, file in enumerate(IMAGE_FILES):
-        # Read an image, flip it around y-axis for correct handedness output (see above).
-        image = cv2.flip(cv2.imread(file), 1)
-        # Convert the BGR image to RGB before processing.
-        results = hands.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+# Making predictions
+predictions = model.predict(X_test)
+predictions
 
-        if not results.multi_hand_landmarks:
-            continue
-        
-        for hand_landmarks in results.multi_hand_landmarks:
-            print('hand_landmarks:', hand_landmarks)
+# Evaluates predictions 
+print('r2:', r2_score(y_test, predictions))
+print('MAE:', mean_absolute_error(y_test, predictions))
+print('MSE:', mean_squared_error(y_test, predictions))
 
-
-# Make pandas dataframe from the images
+# Dumps model into a pkl file
+file = open("file.pkl", "wb") 
+pickle.dump(model, file)
