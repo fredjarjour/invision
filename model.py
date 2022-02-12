@@ -15,6 +15,8 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 
 gb = GradientBoostingRegressor()
 
+# Probably going to take too long => 
+
 # Rate at which correcting is being made
 learning_rate = [0.001, 0.01, 0.1, 0.2]
 # Number of trees in Gradient boosting
