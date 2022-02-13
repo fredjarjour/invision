@@ -5,8 +5,8 @@ from turtle import width
 from PIL import Image, ImageTk
 
 class App(threading.Thread):
-
-    def __init__(self, on_window_update, on_map_pressed, on_del_pressed, on_save_pressed):
+    
+    def __init__(self, on_window_update, on_map_pressed, on_del_pressed, on_save_pressed, on_train_pressed, on_load_pressed):
         threading.Thread.__init__(self)
         self.start()
 
@@ -16,13 +16,15 @@ class App(threading.Thread):
         self.on_map_pressed = on_map_pressed
         self.on_del_pressed = on_del_pressed
         self.on_save_pressed = on_save_pressed
+        self.on_load_pressed = on_load_pressed
+        self.on_train_pressed = on_train_pressed
 
     def callback(self):
         self.root.quit()
 
     def run(self):
         self.root = tk.Tk()
-        self.root.title("Application")
+        self.root.title("Invision")
         
         self.root.protocol("WM_DELETE_WINDOW", self.callback)
         
@@ -39,6 +41,8 @@ class App(threading.Thread):
         self.selected_btn = tk.StringVar()
         self.show_frame_preview = tk.IntVar()
         self.show_frame_preview.set(1)
+        self.in_play_mode = tk.IntVar()
+        self.in_play_mode.set(0)
         
         # self.canvas = tk.Canvas(self.root)
         # self.canvas.pack()
@@ -52,7 +56,7 @@ class App(threading.Thread):
     def del_btn_pressed(self):
         if self.selected_action != None:
             label = self.actions_list.get(self.selected_action)
-            print(label)
+            # print(label)
             for i in range(self.actions_list.size()-1, -1, -1):
                 if self.actions_list.get(i) == label:
                     self.actions_list.delete(i)
@@ -62,6 +66,12 @@ class App(threading.Thread):
     
     def save_btn_pressed(self):
         self.on_save_pressed(self)
+    
+    def load_btn_pressed(self):
+        self.on_load_pressed(self)
+    
+    def train_btn_pressed(self):
+        self.on_train_pressed(self)
 
     def on_actions_list_select(self, event):
         selection = event.widget.curselection()
@@ -80,11 +90,13 @@ class App(threading.Thread):
         self.actions_list.config(state="disabled")
         self.map_btn.config(state="disabled")
         self.del_btn.config(state="disabled")
+        self.train_btn.config(state="disabled")
 
     def enable_controls(self):
         self.btn_select.config(state="readonly")
         self.actions_list.config(state="normal")
         self.map_btn.config(state="normal")
+        self.train_btn.config(state="normal")
 
     def add_to_list(self, item):
         self.actions_list.insert(0, item)
@@ -114,7 +126,7 @@ class App(threading.Thread):
 
             # Combo box for selecting a button
             self.btn_select = ttk.Combobox(self.training, textvariable=self.selected_btn, state="readonly")
-            self.btn_select['values'] = ["Y Button", "X Button", "B Button", "A Button"]
+            self.btn_select['values'] = ["Y Button", "X Button", "B Button", "A Button", "Left Joystick"]
             self.btn_select.current(0)
             self.btn_select.pack()
 
@@ -134,17 +146,21 @@ class App(threading.Thread):
             self.del_btn = ttk.Button(self.training, text="Delete action",state="disabled", command=self.del_btn_pressed)
             self.del_btn.pack()
 
+            # Train model action
+            self.train_btn = ttk.Button(self.training, text="Train model",state="disabled", command=self.train_btn_pressed)
+            self.train_btn.pack()  
+
             # Save model action
             self.save_btn = ttk.Button(self.training, text="Save model", command=self.save_btn_pressed)
             self.save_btn.pack()
 
-            # Train model action
-            self.train_btn = ttk.Button(self.training, text="Train model",state="disabled", command=None)
-            self.train_btn.pack()
+            # Load model action
+            self.load_btn = ttk.Button(self.training, text="Load model", command=self.load_btn_pressed)
+            self.load_btn.pack()
 
             # Play action
-            self.play_btn = ttk.Button(self.training, text="Play",state="disabled", command=None)
-            self.play_btn.pack()
+            self.play_checkbox = tk.Checkbutton(self.training, text='Play',variable=self.in_play_mode, onvalue=1, offvalue=0)
+            self.play_checkbox.pack()
 
             self.settings = tk.Frame(self.root)
             self.settings.pack(side=tk.BOTTOM, fill=tk.X, padx=1.5, pady=1.5)
@@ -154,6 +170,6 @@ class App(threading.Thread):
             self.show_preview_checkbox.pack(side="left")
 
         else:
-            self.on_window_update(self.show_frame_preview.get())
+            self.on_window_update(self, self.show_frame_preview.get(), self.in_play_mode.get())
 
         self.loaded = True

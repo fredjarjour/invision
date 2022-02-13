@@ -7,7 +7,7 @@ import os
 class Database:
 
     # number_of_frames is the buffer size that represents the number of frames to be used for an single action
-    def __init__(self, number_of_frames=11):
+    def __init__(self, number_of_frames=10):
 
         # Creates the list of columns
         self.dfColumns = ['Label']
@@ -16,6 +16,10 @@ class Database:
             self.dfColumns.append(f'X{i}')
             self.dfColumns.append(f'Y{i}')
             self.dfColumns.append(f'Z{i}')
+
+            # self.dfColumns.append(f'VX{i}')
+            # self.dfColumns.append(f'VY{i}')
+            # self.dfColumns.append(f'VZ{i}')
 
         self.dfObj = pd.DataFrame(columns=self.dfColumns)
 
@@ -36,7 +40,7 @@ class Database:
 
     def delete_label(self, label):
         self.dfObj = self.dfObj.loc[self.dfObj["Label"] != label]
-        print(self.dfObj)
+        # print(self.dfObj)
 
     def to_csv(self):
         self.dfObj.to_csv('data.csv')

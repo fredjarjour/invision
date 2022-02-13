@@ -40,19 +40,23 @@ class Gamepad:
     
         self.gamepad = vg.VX360Gamepad()
         
+        self.press_button(16)
         print("Gamepad initialized.")
+        self.release_button(16)
 
     def clamp(self, num, min_value, max_value):
         return max(min(num, max_value), min_value)
 
     def press_button(self, gamepad_button):
         # Example: vg.XUSB_BUTTON.XUSB_GAMEPAD_DPAD_UP
+        print("Pressing button")
         self.gamepad.press_button(button=gamepad_button)
         self.button_pressed[gamepad_button] = True
         self.gamepad.update()
 
     def release_button(self, gamepad_button):
         # Example: vg.XUSB_BUTTON.XUSB_GAMEPAD_DPAD_UP
+        print("Releasing button")
         self.gamepad.release_button(button=gamepad_button)
         self.button_pressed[gamepad_button] = False
         self.gamepad.update()
