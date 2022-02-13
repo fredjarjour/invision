@@ -126,7 +126,7 @@ class App(threading.Thread):
 
             # Combo box for selecting a button
             self.btn_select = ttk.Combobox(self.training, textvariable=self.selected_btn, state="readonly")
-            self.btn_select['values'] = ["Y Button", "X Button", "B Button", "A Button", "Left Joystick"]
+            self.btn_select['values'] = ["Y Button", "X Button", "B Button", "A Button", "Left Joystick", "DPAD Up", "DPAD Down", "DPAD Left", "DPAD Right"]
             self.btn_select.current(0)
             self.btn_select.pack()
 
